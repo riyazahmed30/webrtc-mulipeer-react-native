@@ -2,7 +2,12 @@ import React from 'react';
 import {View} from 'react-native';
 import RBSheet from '@nonam4/react-native-bottom-sheet';
 
-export default function BottomSheetSlide({refRBSheet, child1, child2}) {
+export default function BottomSheetSlide({
+  refRBSheet,
+  child1,
+  child2,
+  height = 200,
+}) {
   return (
     <View
       style={{
@@ -14,7 +19,7 @@ export default function BottomSheetSlide({refRBSheet, child1, child2}) {
         closeOnDragDown={true}
         closeOnPressMask={true}
         animationType="slide"
-        height={200}
+        height={height}
         customStyles={{
           wrapper: {
             backgroundColor: 'transparent',

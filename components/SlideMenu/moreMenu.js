@@ -5,11 +5,17 @@ import IconContainer from '../IconContainer';
 import VerticalDots from '../../asset/VerticalDots';
 import CameraSwitch from '../../asset/CameraSwitch';
 import ShareScreenIcon from '../../asset/ShareScreen';
+import AddUserIcon from '../../asset/AddUser';
 import ChatIcon from '../../asset/Chat';
 import MenuOption from './menuOption';
 import BottomSheetSlide from './index';
 
-export default function Example({onCameraSwitch, onShareScreen, onChatClick}) {
+export default function Example({
+  onCameraSwitch,
+  onShareScreen,
+  onChatClick,
+  onAddParticipantClick,
+}) {
   const refRBSheet = useRef(null);
 
   return (
@@ -48,8 +54,15 @@ export default function Example({onCameraSwitch, onShareScreen, onChatClick}) {
             txt="Chat"
             icon={<ChatIcon height={26} width={26} fill="#fff" />}
           />
+          <MenuOption
+            refRBSheet={refRBSheet}
+            onClick={onAddParticipantClick}
+            txt="Add Participant"
+            icon={<AddUserIcon height={26} width={26} fill="#fff" />}
+          />
         </View>
       }
+      height={300}
     />
   );
 }

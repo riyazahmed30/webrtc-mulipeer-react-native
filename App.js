@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Platform,
   KeyboardAvoidingView,
@@ -7,6 +7,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import TextInputContainer from './components/TextInputContainer';
 import IO from 'socket.io-client';
@@ -125,9 +126,17 @@ export default function App() {
       socket.on('connect', () => {
         console.log('connected');
 
-        socket.on('user-joined', (id, clients) => {
-          console.log(id);
-          console.log(clients);
+        socket.on('user-joined', (id, clients, username) => {
+          if (id !== socket.id) {
+            // show notification
+            console.log(`${username} joined the meeting`);
+
+            setTimeout(() => {
+              socketInstance.emit('message', {isMuted: !localMicOn});
+              socketInstance.emit('message', {isVideoMuted: !localWebcamOn});
+            }, 1000);
+          }
+
           clients.forEach(socketListId => {
             if (!connections[socketListId]) {
               connections[socketListId] = new RTCPeerConnection(
@@ -175,10 +184,12 @@ export default function App() {
         });
       });
 
-      socket.on('user-left', id => {
+      socket.on('user-left', (id, username) => {
         console.log('user-left', id);
         let streamsArr = remoteStreams.filter(v => v.id !== id);
         setRemoteStreams(streamsArr);
+        // show notification
+        console.log(`${username} left the meeting`);
       });
 
       socket.on('endCallForAll', () => {
@@ -188,6 +199,28 @@ export default function App() {
       socket.on('createMessage', (message, id) => {
         const isLeft = socket.id === id;
         setMessages(prevState => [...prevState, {isLeft, ...message}]);
+      });
+
+      socket.on('broadcast-message', (id, message, username) => {
+        if (message.hasOwnProperty('isMuted')) {
+          if (message.isMuted) {
+            console.log('Audio Muted', id);
+          } else {
+            console.log('Audio UnMuted', id);
+          }
+        } else if (message.hasOwnProperty('isVideoMuted')) {
+          if (message.isVideoMuted) {
+            console.log('video off', id);
+          } else {
+            console.log('video on', id);
+          }
+        } else if (message.hasOwnProperty('isScreenShare')) {
+          if (message.isScreenShare) {
+            console.log('screenshare started', id);
+          } else {
+            console.log('screenshare stopped', id);
+          }
+        }
       });
 
       return () => {
@@ -266,18 +299,22 @@ export default function App() {
   };
 
   const toggleMic = () => {
+    socketInstance.emit('message', {isMuted: localMicOn});
     toggleMediaStream('audio', localMicOn);
     setlocalMicOn(prev => !prev);
   };
 
   const toggleCamera = () => {
+    socketInstance.emit('message', {isVideoMuted: localWebcamOn});
     toggleMediaStream('video', localWebcamOn);
     setlocalWebcamOn(prev => !prev);
   };
 
   const endCall = () => {
     setType('JoinScreen');
+    connections = [];
     setRoomName('');
+    setMessages([]);
   };
 
   const endCallForAll = () => {
@@ -450,11 +487,13 @@ export default function App() {
           <MoreMenu
             onCameraSwitch={switchCamera}
             onShareScreen={() => {
-              console.log('share screen clicked');
+              Alert.alert('Info', 'share screen clicked');
             }}
             onChatClick={() => {
-              console.log('Chat clicked');
               setType('Chat');
+            }}
+            onAddParticipantClick={() => {
+              Alert.alert('Info', 'invite participant clicked');
             }}
           />
         </View>
