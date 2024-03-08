@@ -58,11 +58,11 @@ export default function Example({
             refRBSheet={refRBSheet}
             onClick={onAddParticipantClick}
             txt="Add Participant"
-            icon={<AddUserIcon height={26} width={26} fill="#fff" />}
+            icon={<AddUserIcon height={26} width={26} color="#fff" />}
           />
         </View>
       }
-      height={300}
+      height={250}
     />
   );
 }

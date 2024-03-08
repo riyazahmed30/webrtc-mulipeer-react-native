@@ -132,8 +132,8 @@ export default function App() {
             console.log(`${username} joined the meeting`);
 
             setTimeout(() => {
-              socketInstance.emit('message', {isMuted: !localMicOn});
-              socketInstance.emit('message', {isVideoMuted: !localWebcamOn});
+              socket.emit('message', {isMuted: !localMicOn});
+              socket.emit('message', {isVideoMuted: !localWebcamOn});
             }, 1000);
           }
 
