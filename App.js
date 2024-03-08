@@ -311,10 +311,13 @@ export default function App() {
   };
 
   const endCall = () => {
-    setType('JoinScreen');
+    socketInstance.disconnect();
     connections = [];
     setRoomName('');
     setMessages([]);
+    setRemoteStreams([]);
+    setlocalStream(null);
+    setType('JoinScreen');
   };
 
   const endCallForAll = () => {
